@@ -74,26 +74,6 @@ def mrr_at_k(rs, k):
     return mrr
 
 
-def ap(r):
-    """
-    Average precision calculation method
-    Parameters
-    ----------
-    r : List, Relevance scores (list or numpy) in rank order (first element is the first item)
-
-    Returns
-    -------
-    a_p : float, Average precision value
-    """
-    r = np.asarray(r) != 0
-    out = [precision_at_k(r, k + 1) for k in range(r.size) if r[k]]
-    if not out:
-        return 0.
-    a_p = np.sum(out) / len(r)
-
-    return a_p
-
-
 def map_at_k(rs):
     """
     Mean Average Precision calculation method
@@ -209,34 +189,3 @@ def auc_at_k(rs):
     m_auc = uauc / len(rs)
 
     return m_auc
-
-
-def f1_at_k(rs, test_ur):
-    """
-    F1-score calculation method
-    Parameters
-    ----------
-    rs : Dict, {user : rank items} for test set
-    test_ur : Dict, {user : items} for test set ground truth
-
-    Returns
-    -------
-    fs : float, F1-score value
-    """
-    uf1 = 0.
-    for user in rs.keys():
-        r = rs[user]
-        r = np.asarray(r) != 0
-        # start calculate precision
-        prec_k = sum(r) / len(r)
-        # start calculate recall
-        if len(test_ur[user]) == 0:
-            raise KeyError(f'Invalid User Index: {user}')
-        rec_k = sum(r) / len(test_ur[user])
-        # start calculate f1-score
-        f1_k = 2 * prec_k * rec_k / (rec_k + prec_k)
-
-        uf1 += f1_k
-    fs = uf1 / len(rs)
-
-    return fs
